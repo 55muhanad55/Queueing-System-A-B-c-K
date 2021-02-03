@@ -18,10 +18,9 @@ namespace Simulation_Coursework
                     QueueingSystem.nextdepartur = QueueingSystem.servers.Min(job => job.inServeJob.DepartureTime);
                 }
 
-                if ((QueueingSystem.q.Count == 0&& QueueingSystem.Uc ==0) || nextjob.ArrivalTime <= QueueingSystem.nextdepartur)
+                if ((QueueingSystem.Uc ==0) || nextjob.ArrivalTime <= QueueingSystem.nextdepartur)
                 {
                     QueueingSystem.CurrentTime = nextjob.ArrivalTime;
-                    //Console.WriteLine($"current Time = {QueueingSystem.CurrentTime}");
                     if (!QueueingSystem.BoundedQueue || QueueingSystem.Maximumlength >= QueueingSystem.q.Count)
                         QueueingSystem.q.Enqueue(nextjob);
                     nextjob = new job();
@@ -30,13 +29,11 @@ namespace Simulation_Coursework
                     {
                         QueueingSystem.Uc++;
                         QueueingSystem.servers.Add(new Server(QueueingSystem.q.Dequeue()));
-                        //Console.WriteLine($"Entered the server");
                     }
                 }
                 else{
                     var finsihingServer = QueueingSystem.servers.Find(x => x.inServeJob.DepartureTime == QueueingSystem.nextdepartur);
                     QueueingSystem.CurrentTime = finsihingServer.inServeJob.DepartureTime;
-                    //Console.WriteLine($"current Time = {QueueingSystem.CurrentTime}");
 
                     if (QueueingSystem.Uc == 1)
                         QueueingSystem.nextdepartur = QueueingSystem.SimulationTime;
@@ -44,20 +41,13 @@ namespace Simulation_Coursework
                     QueueingSystem.completions.Add(finsihingServer.inServeJob);
                     QueueingSystem.servers.Remove(finsihingServer);
                     QueueingSystem.Uc--;
-                    //Console.WriteLine($"Complation");
 
                     if (QueueingSystem.q.Count > 0)
                     {
                         QueueingSystem.Uc++;
                         QueueingSystem.servers.Add(new Server(QueueingSystem.q.Dequeue()));
-                        //Console.WriteLine($"Entered the server");
                     }
                 }
-
-                /*Console.WriteLine($"\nQueue count = {QueueingSystem.q.Count}");
-                Console.WriteLine($"Utilized Servers = {QueueingSystem.Uc}");
-                Console.WriteLine("--------------------------------------------------------------\n");*/
-
             }
 
             double TotalWaitingTime = 0;
@@ -80,7 +70,7 @@ namespace Simulation_Coursework
             Console.WriteLine("|====================================================================|");
             Console.WriteLine("| job |Inter T |Arival T|Servic T|Serv begin|Wait T|Serv End|Total  T|");
             Console.WriteLine("|-----|--------|--------|--------|----------|------|--------|--------|");
-            int jobs = 0;
+            int jobs = 1;
             foreach (var item in QueueingSystem.completions.OrderBy(x => x.ArrivalTime))
             {
                 Console.WriteLine($"| {jobs++.ToString("000")} | {item.InterArrivalTime.ToString("00.000")} | {item.ArrivalTime.ToString("00.000")} | {item.serviceTime.ToString("00.000")} |" +
@@ -121,10 +111,10 @@ namespace Simulation_Coursework
 
     public static class QueueingSystem
     {
-        public static double SimulationTime = 20;
+        public static double SimulationTime = 50;
         public static double CurrentTime = 0;
         public static double nextdepartur = SimulationTime;
-        public static int c = 4;
+        public static int c = 3;
         public static int Uc = 0;
         public static bool BoundedQueue = false;
         public static int Maximumlength = 10;
@@ -144,13 +134,7 @@ namespace Simulation_Coursework
             return (double)(2.0 * (double)Math.Sqrt(Math.Sqrt(uniform(0,2))));
         }
 
-        public static double factorial_Recursion(int number)
-        {
-            if (number == 1)
-                return 1;
-            else
-                return number * factorial_Recursion(number - 1);
-        }
+       
     }
 
     public class job
@@ -166,7 +150,7 @@ namespace Simulation_Coursework
 
         public job()
         {
-            InterArrivalTime = QueueingSystem.uniform(0, 1);
+            InterArrivalTime = QueueingSystem.uniform(0, 2);
             ArrivalTime = QueueingSystem.CurrentTime + InterArrivalTime;
         }
 
