@@ -35,12 +35,12 @@ namespace Simulation_Coursework
                     var finsihingServer = QueueingSystem.servers.Find(x => x.inServeJob.DepartureTime == QueueingSystem.nextdepartur);
                     QueueingSystem.CurrentTime = finsihingServer.inServeJob.DepartureTime;
 
-                    if (QueueingSystem.Uc == 1)
-                        QueueingSystem.nextdepartur = QueueingSystem.SimulationTime;
-
                     QueueingSystem.completions.Add(finsihingServer.inServeJob);
                     QueueingSystem.servers.Remove(finsihingServer);
                     QueueingSystem.Uc--;
+
+                    if (QueueingSystem.Uc == 0)
+                        QueueingSystem.nextdepartur = QueueingSystem.SimulationTime;
 
                     if (QueueingSystem.q.Count > 0)
                     {
@@ -73,8 +73,10 @@ namespace Simulation_Coursework
             int jobs = 1;
             foreach (var item in QueueingSystem.completions.OrderBy(x => x.ArrivalTime))
             {
-                Console.WriteLine($"| {jobs++.ToString("000")} | {item.InterArrivalTime.ToString("00.000")} | {item.ArrivalTime.ToString("00.000")} | {item.serviceTime.ToString("00.000")} |" +
-                    $"  {item.starttingService.ToString("00.000")}  |{item.WaitingTime.ToString("00.000")}| {item.serviceEnd.ToString("00.000")} | {item.TotalTime.ToString("00.000")} |");
+                Console.WriteLine($"| {jobs++.ToString("000")} | {item.InterArrivalTime.ToString("00.000")} |"+
+                    $"{item.ArrivalTime.ToString("00.000")} | {item.serviceTime.ToString("00.000")} |" +
+                    $"  {item.starttingService.ToString("00.000")}  |{item.WaitingTime.ToString("00.000")}|"+
+                    $" {item.serviceEnd.ToString("00.000")} | {item.TotalTime.ToString("00.000")} |");
 
                 if(item.WaitingTime > 0)
                 {
@@ -90,13 +92,23 @@ namespace Simulation_Coursework
             lambda = jobs / TotalInterarrival;
             mue = jobs / TotalServiceTime;
 
+            Console.WriteLine("\n");
+            Console.WriteLine($"lamda = {lambda}, c * mue = {QueueingSystem.c * mue}");
+            if(QueueingSystem.c*mue > lambda)
+            {
+                Console.WriteLine("the system is stable");
+            }
+            else
+            {
+                Console.WriteLine("the system is not stable");
+            }
             double Pout = AvaregeIdle / QueueingSystem.CurrentTime;
 
 
             Console.WriteLine("\n");
             Console.WriteLine($"the average waiting time: {TotalWaitingTime/ jobs} sec");
             Console.WriteLine($"the average waiting time of those who wait: {TotalWaitingTime/WaiteJobs} sec");
-            Console.WriteLine($"the state probabilities : {Pout} %");
+            Console.WriteLine($"the P out : {Pout} %");
             Console.WriteLine($"the utilization: {(TotalServiceTime/QueueingSystem.CurrentTime)/QueueingSystem.c} %");
             Console.WriteLine($"the mean queue length: {TotalQueueLenth / jobs}");
             Console.WriteLine($"the throughput: {jobs / QueueingSystem.CurrentTime} job/sec");
@@ -114,7 +126,7 @@ namespace Simulation_Coursework
         public static double SimulationTime = 50;
         public static double CurrentTime = 0;
         public static double nextdepartur = SimulationTime;
-        public static int c = 3;
+        public static int c = 4;
         public static int Uc = 0;
         public static bool BoundedQueue = false;
         public static int Maximumlength = 10;
@@ -150,7 +162,7 @@ namespace Simulation_Coursework
 
         public job()
         {
-            InterArrivalTime = QueueingSystem.uniform(0, 2);
+            InterArrivalTime = QueueingSystem.uniform(0, 1);
             ArrivalTime = QueueingSystem.CurrentTime + InterArrivalTime;
         }
 
