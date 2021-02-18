@@ -8,5 +8,3 @@ A/B/c queue with inter-arrival times following a uniform distribution and servic
 Developed By:<br>
 
 Muhanad Ibrahim Alkhalil<br>
-
-Abdullatif Hejazi
